@@ -50,14 +50,14 @@ class Gradient:
     def calculate_error(self) -> float:
         """
         Calculates error of distances
-        :return: error * 100
+        :return: error
         """
         dist_sum = 0
         for i in range(0, self.N):
             for j in range(i + 1, self.N):
-                dist_sum = (((self.C[i, j] - self.d[i, j]) ** 2) / self.C[i, j] + 0.0001)
-
-        return dist_sum / (self.old_sum + 0.0001) * 100
+                dist_sum += (((self.C[i, j] - self.d[i, j])
+                             ** 2) / (self.C[i, j]+0.01))
+        return dist_sum / (self.old_sum)
 
     def calculate_distances(self):
         for i in range(0, self.N):
@@ -82,7 +82,7 @@ class Gradient:
                 continue
             else:
                 numerator += (((self.C[p, j] - self.d[p, j]) / (self.d[p, j] * self.C[p, j] + 0.001)) * (
-                        self.y[p, q] - self.y[j, q]))
+                    self.y[p, q] - self.y[j, q]))
                 denominator += (1 / (self.C[p, j] * self.d[p, j] + 0.001))
 
                 #
@@ -147,22 +147,20 @@ if __name__ == '__main__':
     Ynew = np.dot(vectors[:, 2], X_centered)
     # plt.subplot(1, 3, 1)
     # plt.scatter(Xnew, Ynew)
-    # # grad.y[:, 1] = Ynew
+    # grad.y[:, 1] = Ynew
     # grad.y[:, 0] = Xnew
-    # plt.subplot(1, 3, 1)
-    # plt.scatter(grad.y[:, 0], grad.y[:, 1])
+    plt.subplot(1, 3, 1)
+    plt.scatter(grad.y[:, 0], grad.y[:, 1])
     grad.calculate_distances()
-    plt.subplot(1, 1, 1)
-    for j in range(0, 7):
-        errors = []
-        grad = Gradient(points)
-        for i in range(0, 500):
-            error = grad.calculate_error()
-            print(f"{i}) Error is {error}")
-            errors.append(error)
-            grad.new_coords()
-        plt.plot(range(0, len(errors)), errors)
-    # plt.subplot(1, 3, 2)
-    # plt.scatter(grad.y[:, 0], grad.y[:, 1])
+    plt.subplot(1, 3, 3)
+    errors = []
+    for i in range(0, 700):
+        error = grad.calculate_error()
+        errors.append(error)
+        print(f"{i}) Error is {error}")
+        grad.new_coords()
+    plt.plot(range(0, 700), errors)
+    plt.subplot(1, 3, 2)
+    plt.scatter(grad.y[:, 0], grad.y[:, 1])
 
     plt.show()
